@@ -1,0 +1,580 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RNAshapes - RNA Analysis based on Abstract Shapes</title>
+<link rel="stylesheet" href="RNAshapes.css" type="text/css" />
+<link rev="made" href="mailto:support@TechFak.Uni-Bielefeld.DE" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#the_abstract_shapes_approach">The abstract shapes approach</a></li>
+		<li><a href="#shape_representative_analysis">Shape representative analysis</a></li>
+		<li><a href="#shape_probabilities">Shape probabilities</a></li>
+		<li><a href="#consensus_shapes">Consensus shapes</a></li>
+	</ul>
+
+	<li><a href="#input">INPUT</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<ul>
+
+		<li><a href="#sequence_analysis_modes">Sequence analysis modes</a></li>
+		<li><a href="#additional_modes_(use_with_any_of_the_above)">Additional modes (use with any of the above)</a></li>
+		<li><a href="#analysis_control">Analysis control</a></li>
+		<li><a href="#input/output">Input/Output</a></li>
+		<li><a href="#additional_interactive_mode_commands">Additional interactive mode commands</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#exit_status">EXIT STATUS</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#references">REFERENCES</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<TABLE width="746" cellspacing="0" cellpadding="0" border="0">
+<TR><TD background="frtop_d.jpg" colspan="0" height="45" valign="bottom" align="right">
+&nbsp;
+</TD></TR><TR><TD background="frback.jpg">
+<BR>
+<DIV style="text-align: center">
+<TABLE width="95%" background="">
+<TR><TD>&nbsp;&nbsp;&nbsp;</TD><TD><DIV style="text-align: left"><p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>RNAshapes - RNA Analysis based on Abstract Shapes</p>
+<center><img src="RNAshapes.jpg" border="1"></center><p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>RNAshapes [<strong>-h</strong>] [<strong>-a</strong>] [<strong>-s</strong>] [<strong>-p</strong>] [<strong>-i</strong> <code>sampling iterations</code>] <code>input sequence</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This manual describes RNAshapes, a software package that integrates
+three RNA analysis tools based on the abstract shapes approach
+(Steffen et al. 2005): the analysis of shape representatives
+(Giegerich et al. 2004), the calculation of shape probabilities (Voss
+et al. 2005), and the consensus shapes approach (Reeder and Giegerich
+2005). This new package is completely reimplemented in C, and outruns
+the original implementations significantly in runtime and memory
+requirements.  Additionally, we added a number of useful features like
+suboptimal folding with correct dangling energies, structure graph
+output, shape matching, and a sliding window approach.</p>
+<p>In the following, we will shortly review the notion of abstract
+shapes, and explain where its power comes from. We will then provide
+an overview of the problems that can be approached in the new way.</p>
+<p>
+</p>
+<h2><a name="the_abstract_shapes_approach">The abstract shapes approach</a></h2>
+<p>An RNA shape is an abstract representation of an RNA secondary
+structure.  It is inspired by the dot-bracket representation known
+from the Vienna RNA package (Hofacker et al. 1994). Consider the
+following sequence and two secondary structures from its folding space
+in dot-bracket representation:</p>
+<pre>
+  AUCGGCGCACAGGACAUCCUAGGUACAAGGCCGCCCGUU
+  ..(((.((..(((....))).(((.....))))))))..
+  ..(((.....(((....))).(((.....)))..)))..</pre>
+<p>The shapes approach offers five abstraction levels (or <em>shape types</em>)
+ordered in their degree of abstraction. Common to all levels is that
+they abstract from loop and stack lengths, where unpaired regions are
+represented by an underscore and stacking regions by a pair of squared
+brackets.  This is the least abstract shape type 1, so the two example
+secondary structures become:</p>
+<pre>
+  _[_[_[_]_[_]]]_
+  _[_[_]_[_]_]_</pre>
+<p>The succeeding shape types gradually increase abstraction, ending in
+type 5, where no unpaired regions are included and nested helices are
+combined. In this type, our example structures are both represented
+as:</p>
+<pre>
+  [[][]]</pre>
+<p>These abstractions form the basis of all applications of RNA abstract
+shape analysis. In the following we give an overview of the main
+applications, all integrated in the RNAshapes package.</p>
+<p>
+</p>
+<h2><a name="shape_representative_analysis">Shape representative analysis</a></h2>
+<p>Current RNA folding algorithms either calculate a single, minimum free
+energy prediction, or a huge number of suboptimal structures, most of
+which are quite similar and therefore redundant. With shapes, we
+abstract from the concrete secondary structures and only consider
+classes of structures that fall into different shapes. The <em>shape
+representative</em> (in short: <em>shrep</em>) of a shape is the structure with
+the minimum free energy inside a shape class.</p>
+<p>
+</p>
+<h2><a name="shape_probabilities">Shape probabilities</a></h2>
+<p>In (Voss et al. 2005), we extended the shapes approach to the
+computation of shape probabilities. The probability of a shape is the
+sum of the probabilities of all structures that fall into this shape.
+Several analyses indicate that this approach is quite effective.  For
+example, an analysis of a conformational switch shows the existence of
+two shapes with probabilities approximately 2/3 vs. 1/3, whereas the
+analysis of a micro RNA precursor reveals the hairpin shape with a
+probability near to 1.0 (Voss et al. 2005).</p>
+<p>RNAshapes contains three approaches for probability analysis, suitable
+for different input sizes: Complete probability analysis, sampling
+shapes probability analysis, and fast high probability shape analysis.</p>
+<p>
+</p>
+<h2><a name="consensus_shapes">Consensus shapes</a></h2>
+<p>The well-known Sankoff algorithm (Sankoff 1985) for simultaneous RNA
+sequence alignment and folding is currently considered an ideal, but
+computationally over-expensive method. Available tools implement this
+algorithm under various pragmatic restrictions.  In (Reeder and
+Giegerich 2005), we proposed to redefine the consensus structure
+prediction problem in a way that does not imply a multiple sequence
+alignment step. For a family of RNA sequences, our method RNAcast
+explicitly and independently enumerates the near-optimal abstract
+shape space, and predicts as the consensus an abstract shape common to
+all sequences.  For each sequence, it delivers the thermodynamically
+best structure that has this common shape. Since the shape space is
+much smaller than the structure space, and identification of common
+shapes can be done in linear time (in the number of shapes
+considered), the method is essentially linear in the number of
+sequences. Our evaluation showed that the new method compares favorably
+with available alternatives (Reeder and Giegerich 2005). It is
+particularly useful on sequences with low conservation, where methods
+based on sequence alignment cannot be employed. We have now integrated
+RNAcast into the RNAshapes package.</p>
+<p>
+</p>
+<hr />
+<h1><a name="input">INPUT</a></h1>
+<p>As input, RNAshapes accepts a plain single sequence, or multiple
+sequences in fasta format. When given multiple sequences, each
+sequence is processed separately in the order of input.</p>
+<p>Input can be given by four different ways:</p>
+<p>- Command line parameter, e.g.:</p>
+<pre>
+    RNAshapes GAGCCTGGGAGCTCTCTGGCTAACTGGGAACCCACTGCTTAAGCC</pre>
+<p>- Console standard input, e.g.:</p>
+<pre>
+    echo GAGCTCTCTGGCTAACTGGGAACCCACTGCTTAAGCC | RNAshapes
+    RNAshapes &lt; sequences.fasta</pre>
+<p>- File input with option <strong>-f</strong>, e.g.:</p>
+<pre>
+    RNAshapes -f sequences.fasta</pre>
+<p>- Interactive input. To activate this mode, start RNAshapes without giving any input sequences.</p>
+<p>Valid characters in an input sequence are ``ACGU'' and ``acgu''. ``T'' and
+``t'' will be converted to ``U''. Other letters are mapped to ``N'' and will
+not be paired. All other characters are ignored.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<a name="option_h"></a><p><strong>-h</strong>       Display command option overview</p>
+<a name="option_H"></a><p><strong>-H</strong> <code>option</code> Display detailed information on <code>option</code></p>
+<p>This displays the corresponding section of the RNAshapes manual for
+the given command line option.</p>
+<a name="option_v"></a><p><strong>-v</strong>       Show version</p>
+<p>This shows the version number of RNAshapes.</p>
+<p>
+</p>
+<h2><a name="sequence_analysis_modes">Sequence analysis modes</a></h2>
+<a name="option_a"></a><p><strong>-a</strong>       Shape folding (standard mode)</p>
+<p>RNA folding based on abstract shapes. This is the standard mode of
+operation when no other options are given. It calculates the shapes
+and the corresponding shreps based on free energy minimization. The
+energy range can be set by <strong>-e</strong> and <strong>-c</strong>. When not specified, the
+energy range is set to 10% of the minimum free energy.</p>
+<a name="option_s"></a><p><strong>-s</strong>       Complete suboptimal folding</p>
+<p>Complete suboptimal folding of RNA. This mode uses a non-ambiguous
+grammar that also handles dangling bases of multiloop components in a
+non-ambiguous way. The energy range can be set by <strong>-e</strong> and
+<strong>-c</strong>. When not specified, the energy range is set to 10% of the
+minimum free energy.</p>
+<a name="option_p"></a><p><strong>-p</strong>       Shape probabilities</p>
+<p>Shape probability mode. This option calculates the shape probabilities
+based on partition function. The probability of a shape is the sum of
+the probabilities of all structures that fall into this shape. On a
+computer with 2GB main memory, sequences up to a length of 300 bases
+can be processed with this mode.</p>
+<a name="option_q"></a><p><strong>-q</strong>       Shape probabilities (including shreps)</p>
+<p>Shape probability mode. Calculates the shape probabilities based on
+partition function. This is the same as <strong>-p</strong>, and additionally, the
+corresponding shreps with their minimum free energies are
+calculated. Note that this mode is slightly slower than <strong>-p</strong> and can
+be used with sequences up to a length of 250 bases.</p>
+<a name="option_P"></a><p><strong>-P</strong> <code>value</code> Shape probabilities for mfe-best shapes</p>
+<p>Shape probability mode. This mode first calculates the best <code>value</code>
+shapes based on free energy minimization. In a second step, it
+calculates the probability for each of these best shapes. This mode
+has lower memory requirements than modes <strong>-p</strong> and <strong>-q</strong> and can be
+used for longer sequences (up to 500 bases).  The energy range must be
+specified with <strong>-e</strong> or <strong>-c</strong> in order to get the desired number of
+results.</p>
+<a name="option_i"></a><p><strong>-i</strong> <code>value</code> Sampling with <code>value</code> iterations</p>
+<p>Probabilistic sampling based on partition function.  This mode
+combines stochastic sampling with a-posteriori shape abstraction. A
+sample from the structure space holds M structures together with their
+shapes, on which classification is performed. The probability of a
+shape can then be approximated by its frequency in the sample.</p>
+<p>Sequences up to a length of around 1500 can be handled with this mode.
+In our experience, 1000 iterations are sufficient to achieve
+reasonable results for shapes with high probability.</p>
+<p><strong>-C</strong>       Consensus shapes (RNAcast)</p>
+<p>For a family of RNA sequences, this method independently enumerates
+the near-optimal abstract shape space, and predicts as the consensus
+an abstract shape common to all sequences.  For each sequence, it
+delivers the thermodynamically best structure which has this common
+shape. Since the shape space is much smaller than the structure space,
+and identification of common shapes can be done in linear time (in the
+number of shapes considered), the method is essentially linear in the
+number of sequences.
+Input for RNAcast must be provided in multiple fasta format, e.g.:</p>
+<pre>
+  cat test.fasta
+  &gt;seq1
+  CACACAAAGGCAGCGGAACCCCCCUCCUGGUAACAGGAGCCU
+  &gt;seq2
+  AGGCAGCGGAAAUCCCCACCUGGUAACAGGUGCCUCUGC
+  &gt;seq3
+  CCUUUGCAGGCAGCGGAAUCCCCCACCUGGUGACAGGUGCCU</pre>
+<p>The output of RNAcast first shows the common shape, the score (the sum
+of the structure energies), and the ratio of the score to the sum of
+all mfe values. A ratio near 1.0 means a good conservation, a lower
+ratio means less conservation. Then, for each input RNA the predicted
+shrep, its energy, and its individual rank (R = ...) in the shape
+space is printed:</p>
+<pre>
+  RNAshapes -f test.fasta -C -e 2
+  1) Shape: [[][]]  Score: -40.70  Ratio of MFE: 0.96
+  &gt;seq1
+          CACACAAAGGCAGCGGAACCCCCCUCCUGGUAACAGGAGCCU
+  -12.30  .......((((...((....))..(((((....)))))))))  [[][]]  R = 1
+  &gt;seq2
+          AGGCAGCGGAAAUCCCCACCUGGUAACAGGUGCCUCUGC
+  -13.10  ..((((.((....)).((((((....))))))...))))  [[][]]  R = 2
+  &gt;seq3
+          CCUUUGCAGGCAGCGGAAUCCCCCACCUGGUGACAGGUGCCU
+  -15.30  .......((((...((....))..(((((....)))))))))  [[][]]  R = 1</pre>
+<p>To get more results, increase energy range with <strong>-e</strong> or <strong>-c</strong>.</p>
+<p>We propose to use the output of the consensus shapes analysis as input
+for RNAforester (Hoechsmann et al., 2004), a multiple RNA structure
+alignment program. Use output type <strong>-o</strong> f together with option <strong>-C</strong>
+to generate suitable input for RNAforester. For example:</p>
+<pre>
+  RNAshapes -f test.fasta -C -o f | RNAforester -m</pre>
+<p>Note that with output type <strong>-o</strong> f only the result for the first
+consensus is printed (otherwise RNAforester would not work
+properly). Use the shape match option <strong>-m</strong> to get alternative
+results. RNAforester is now part of the Vienna RNA package and can be
+downloaded at <a href="http://www.tbi.univie.ac.at/~ivo/RNA/.">http://www.tbi.univie.ac.at/~ivo/RNA/.</a></p>
+<p>
+</p>
+<h2><a name="additional_modes_(use_with_any_of_the_above)">Additional modes (use with any of the above)</a></h2>
+<a name="option_r"></a><p><strong>-r</strong>  Calculate structure probabilities</p>
+<p>This calculates the probability of every computed structure. It can be
+combined with any sequence analysis mode. Note that this option
+increases processing time of modes <strong>-a</strong>, <strong>-s</strong> and <strong>-C</strong>.</p>
+<a name="option_w"></a><p><strong>-w</strong> <code>value</code>  Specify window size</p>
+<p>Beginning with position 1 of the input sequence, the analysis is
+repeatedly processed on subsequences of the specified size. After each
+calculation, the results are printed out and the window is moved by
+the window position increment (<strong>-W</strong>), until the end of the input
+sequence is reached.</p>
+<a name="option_W"></a><p><strong>-W</strong> <code>value</code>  Specify window position increment (use with <strong>-w</strong>) [1]</p>
+<p>This specifies the increment for the window analysis mode (<strong>-w</strong>).</p>
+<a name="option_m"></a><p><strong>-m</strong> <code>shape</code> Match shape (use with <strong>-a</strong>, <strong>-s</strong>, <strong>-p</strong>, <strong>-q</strong>, or <strong>-C</strong>)</p>
+<p>Specify a shape for the corresponding mode of operation. For example,
+with options <strong>-p</strong> <strong>-m</strong> '[]' the probability of shape [] is
+computed.</p>
+<p>
+</p>
+<h2><a name="analysis_control">Analysis control</a></h2>
+<a name="option_e"></a><p><strong>-e</strong> <code>value</code> Set energy range (kcal/mol)</p>
+<p>This sets the energy range for shape folding (<strong>-a</strong>), complete
+suboptimal folding (<strong>-s</strong>), probability analysis with <strong>-P</strong>, and
+consensus shapes analysis (<strong>-C</strong>). <code>value</code> is the difference to the
+minimum free energy for the sequence.</p>
+<a name="option_c"></a><p><strong>-c</strong> <code>value</code> Set energy range (%) [10]</p>
+<p>This sets the energy range as percentage value of the minimum free
+energy. For example, when <strong>-c</strong> 10 is specified, and the minimum free
+energy is -10.0 kcal/mol, the energy range is set to -9.0 to -10.0
+kcal/mol.</p>
+<a name="option_t"></a><p><strong>-t</strong> <code>value</code> Specify shape type (1-5) [5]</p>
+<p>The shape type is the level of abstraction or dissimilarity which
+defines a different shape. In general, helical regions are depicted by
+a pair of opening and closing square brackets and unpaired regions are
+represented as a single underscore. The differences of the shape types
+are due to whether a structural element (bulge loop, internal loop,
+multiloop, hairpin loop, stacking region and external loop)
+contributes to the shape representation: Five types are
+implemented. Their differences are shown in the following example:</p>
+<pre>
+  AUCGGCGCACAGGACAUCCUAGGUACAAGGCCGCCCGUU
+  ..(((.((..(((....))).(((.....))))))))..
+                                
+Type 5: Most abstract - helix nesting pattern and no unpaired regions</pre>
+<pre>
+  [[][]]</pre>
+<p>Type 4: helix nesting pattern and unpaired regions in external loop and multiloop</p>
+<pre>
+  [[][]]</pre>
+<p>Type 3: nesting pattern for all loop types but no unpaired regions</p>
+<pre>
+  [[[][]]]</pre>
+<p>Type 2: nesting pattern for all loop types and unpaired regions in external loop and multiloop</p>
+<pre>
+  [_[[][]]]</pre>
+<p>Type 1: Most accurate - all loops and all unpaired</p>
+<pre>
+  _[_[_[]_[]]]_</pre>
+<a name="option_F"></a><p><strong>-F</strong> <code>value</code> Set probability cutoff filter (use with <strong>-p</strong>, <strong>-q</strong> or <strong>-P</strong>)</p>
+<p>This option sets a barrier for filtering out results with very low
+probabilities during calculation. The default value here is 0.000001,
+which gives a significant speedup compared to a disabled filter. Note
+that this filter can have a slight influence on the overall
+results. To disable this filter, use option <strong>-F</strong> 0.</p>
+<a name="option_T"></a><p><strong>-T</strong> <code>value</code>  Set probability output filter (use with <strong>-p</strong>, <strong>-q</strong> or <strong>-P</strong>)</p>
+<p>This option sets a filter for omitting low probability results during
+output. Unlike <strong>-F</strong>, this option does not have any influence on
+probabilities beyond this value.</p>
+<a name="option_M"></a><p><strong>-M</strong> <code>value</code>  Set maximum loop length [30]  (use -M n for unrestricted)</p>
+<p>This option sets the maximum lengths of the considered internal and
+bulge loops. The default value here is 30. Note that this restriction
+can have a very slight influence on the calculated structure and shape
+probabilities. For unrestricted loop lengths, use option <strong>-M</strong> n. This
+will increase calculation times and memory requirements.</p>
+<a name="option_y"></a><p><strong>-y</strong> <code>value</code>  Set minimal shape length</p>
+<p>This option sets the minimal shape length. Subshapes smaller than
+<code>value</code> are omitted from the analysis.</p>
+<a name="option_l"></a><p><strong>-l</strong>       Allow lonely base pairs</p>
+<p>In default mode, RNAshapes only considers helices of length 2 or
+longer. With option <strong>-l</strong>, lonely base pairs are also included.</p>
+<a name="option_u"></a><p><strong>-u</strong>       Ignore unstable structures (use with <strong>-a</strong>, <strong>-s</strong> or <strong>-C</strong>)</p>
+<p>This option filters out closed structures with positive free
+energy.</p>
+<p>
+</p>
+<h2><a name="input/output">Input/Output</a></h2>
+<a name="option_o"></a><p><strong>-o</strong> <code>value</code> Specify output type (1-4,f) [2]</p>
+<p>Specifies the output type. Output type 1 mimics RNAfold and RNAsubopt.
+Type 2 is the default RNAshapes output. Type 3 is similar to type 2,
+but without parentheses and with only a single space between
+results. This output type can be used for exporting results as a comma
+separated text-file to other applications like Microsoft Excel. Type 4
+is a colored variant of type 2. Additional output types can be defined
+with option <strong>-O</strong>.</p>
+<p>In consensus shapes analysis (<strong>-C</strong>), output type f can be used to
+generate suitable input for RNAforester (a multiple RNA structure
+alignment program; see <strong>-C</strong> for details).</p>
+<a name="option_O"></a><p><strong>-O</strong> <code>string</code> Specify output format string</p>
+<p>The option <strong>-O</strong> can be used to ``fine-tune'' the format of the printed
+results, for example when we are only interested in parts of the
+result, or when results of RNAshapes should be used as input for other
+programs. The syntax is as follows:</p>
+<pre>
+  TYPE{FORMAT}...TYPE{FORMAT}</pre>
+<p>where TYPE specifies the result element:</p>
+<pre>
+  D: structure in dot-bracket notation
+  S: shape string
+  E: energy
+  P: shape probability
+  R: structure probability (option -r)
+  C: shape rank (option -C)
+  V: verbatim output, independent of result element</pre>
+<p>FORMAT is the C-format string that shall be used to print the
+corresponding result element. Typical C-format strings are %.2f for a
+floating point number with two decimal places and %s for a string. For
+example, to print only the structure followed by its energy, we can
+use -O 'D{%s\t}E{%.2f}V{\n}'. The symbol '\n' performs a line break,
+the symbol '\t' a tabulator. An ANSI escape sequence can be used with
+symbol '\e' (see Example 4 below).</p>
+<p>The standard output types (option <strong>-o</strong>) are defined as follows:</p>
+<pre>
+  1) 'D{%s  }E{(%.2f)  }R{(%.7f)  }P{%.7f  }S{%s}C{  R = %d}V{\n}'
+  2) 'E{%-8.2f}R{(%.7f)  }D{%s  }P{%.7f  }S{%s}C{  R = %d}V{\n}'
+  3) 'E{%.2f }R{%.7f }D{%s }P{%.7f }S{%s}C{ %d}V{\n}'
+  4) 'E{%-8.2f}R{(%.7f)  }D{\e[1;31m%s\e[0m  }
+      P{\e[1;30m%.7f\e[0m  }S{%s}C{  R = %d}V{\n}'</pre>
+<a name="option_S"></a><p><strong>-S</strong> <code>value</code>  Specify output width for structures</p>
+<p>This splits the structure strings into parts of the specified
+length. This option is useful when displaying results for long
+sequences that would otherwise not fit onto the screen.</p>
+<a name="option_#"></a><p><strong>-#</strong> <code>value</code>  Print only the first <code>value</code> results</p>
+<p>This option specifies the total number of results to be printed. When
+this number is reached, the program terminates. Note that this option
+does not reduce calculation time or memory requirements (except for
+modes <strong>-s</strong> and <strong>-i</strong>).</p>
+<a name="option_g"></a><p><strong>-g</strong> <code>value</code> Generate structure graphs for first <code>value</code> structures</p>
+<p>This generates postscript structure graphs for the first <code>value</code>
+structures computed for a sequence. If multiple sequences are given,
+<code>value</code> graphs are generated for each sequence.</p>
+<p>The filenames of the structure graphs consist of several parts:</p>
+<p>1. When the input sequence is given in fasta format, the first 12
+   characters of the sequence description are taken. White-spaces and
+   special characters are removed. When no description is available,
+   ``rna'' is chosen as standard name.</p>
+<p>2. The sequence position in window mode (option <strong>-w</strong>).</p>
+<p>3. The running number of the result.</p>
+<p>For example, the first result of a sequence called ``xyz'' at position 7
+in window mode will be saved in file xyz_7_1.ps.</p>
+<a name="option_L"></a><p><strong>-L</strong>        Highlight uppercase characters in structure graphs</p>
+<p>Used with option <strong>-g</strong>, this generates postscript structure graphs
+where all uppercase characters in the input sequence are
+highlighted. This option is useful for marking interesting regions of
+the input sequence.</p>
+<a name="option_N"></a><p><strong>-N</strong>        Do not include additional information in graph output file</p>
+<p>In standard operation, the postscript structure graph generation
+(option <strong>-g</strong>) generates files with shape, energy, and shape
+probability (if available) included at the bottom. Use this option to
+suppress this.</p>
+<a name="option_A"></a><p><strong>-A</strong>        Omit samples in output</p>
+<p>Omit output of samples in sampling mode (<strong>-i</strong>)</p>
+<a name="option_f"></a><p><strong>-f</strong> <code>file</code>   Read input from <code>file</code></p>
+<p>Let RNAshapes load its input data from <code>file</code>.  <code>file</code> can
+contain a plain single sequence, or multiple sequences in fasta
+format. When given multiple sequences, each sequence is processed
+separately in the order of input.</p>
+<p>Valid characters in an input sequence are ``ACGU'' and ``acgu''. ``T'' and
+``t'' will be converted to ``U''. Other letters are mapped to ``N'' and will
+not be paired. All other characters are ignored.</p>
+<a name="option_B"></a><p><strong>-B</strong>       Show progress bar (use with <strong>-p</strong>, <strong>-q</strong> or <strong>-P</strong>)</p>
+<p>Setting this option activates a progress bar. This is useful when
+experimenting with options <strong>-p</strong> and <strong>-q</strong>, to get an impression of
+the expected running time.</p>
+<a name="option_z"></a><p><strong>-z</strong>          Enable colors (in interactive mode: disable colors)</p>
+<p>This option enables colored output. In interactive mode, this is the
+default setting, so use <strong>-z</strong> to disable colors here.</p>
+<a name="option_Z"></a><p><strong>-Z</strong>          Enable colors for dotbracket and shape strings</p>
+<p>This option colors dotbracket and shape strings in the result output,
+such that corresponding structural elements have the same color in
+both representations.</p>
+<a name="option_D"></a><p><strong>-D</strong> <code>string</code>  Convert dotbracket-string to shape (choose type with <strong>-t</strong>)</p>
+<p>Convert a dotbracket-string into a shape. Choose the shape type with
+option <strong>-t</strong>. The default shape type is 5. For example:</p>
+<pre>
+  RNAshapes -D '.((((.(((....))).))))...(((....))).' -t 4
+  _[]_[]_</pre>
+<a name="option_U"></a><p><strong>-U</strong>          Start graphical user interface</p>
+<p>This option starts the graphical user interface included in the
+RNAshapes distribution. It requires Java 1.4.2 or later (download from
+<a href="http://java.sun.com/).">http://java.sun.com/).</a> Note that the RNAshapes distribution for
+Microsoft Windows includes a slightly different user interface. 
+It does not require Java and additionaly, it offers an interactive
+visualization of the calculated RNA structures.</p>
+<p>
+</p>
+<h2><a name="additional_interactive_mode_commands">Additional interactive mode commands</a></h2>
+<p><strong>:s</strong>          Show current configuration</p>
+<p>This command shows the current settings in an interactive session.</p>
+<p><strong>:d</strong>           Reset configuration</p>
+<p>This command sets all settings to their default values.</p>
+<p><strong>:e</strong> <code>string</code> Execute system command</p>
+<p>Command <strong>:e</strong> executes a system command. For example, we can use the
+command <strong>:e</strong> gv rna_1.ps to open a structure graph file created with
+option <strong>-g</strong> (on a unix machine with gv installed).</p>
+<p><strong>:q</strong>           Quit</p>
+<p>This command quits an interactive RNAshapes session.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>Calculate shapes based on free energy minimization:</p>
+<pre>
+    RNAshapes GAGCCTGGGAGCTCTCTGGCTAACTGGGAACCCACTGCTTAAGCC</pre>
+<p>Pipe file <em>input.seq</em> into the program:</p>
+<pre>
+    RNAshapes &lt; input.seq</pre>
+<p>Calculate probabilities for input sequences:</p>
+<pre>
+    RNAshapes -p &lt; input.seq</pre>
+<p>Calculate probabilities for the 5 energetically best shapes, using an
+energy range up to 30% of the minimum free energy. Generate structure
+graphs for the first three structures of each sequence:</p>
+<pre>
+    RNAshapes -P 5 -c 30 -g 3 &lt; input.seq</pre>
+<p>Calculate probability of shape _[]_[]_[]_, using shape type 4:</p>
+<pre>
+    RNAshapes -p -m _[]_[]_[]_ -t 4 &lt; input.seq</pre>
+<p>Calculate probability of shape [], using a window of size 100:</p>
+<pre>
+    RNAshapes -p -m [] -w 100 &lt; input.seq</pre>
+<p><strong>See more examples in the RNAshapes user's manual (RNAshapes.pdf)</strong>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="exit_status">EXIT STATUS</a></h1>
+<p>RNAshapes returns a zero exit status if it succeeds. Non zero is
+returned in case of failure.</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>Copyright (C) 2005-2006 Peter Steffen, Bjoern Voss, Jens Reeder,
+Marc Rehmsmeier, Robert Giegerich.</p>
+<p>PS, JR, RG: Faculty of Technology, Bielefeld University, 33594
+Bielefeld, Germany</p>
+<p>BV: Institute of Biology II, Experimental Bioinformatics, Freiburg
+University, Schaenzlestr. 1, 79104 Freiburg, Germany</p>
+<p>MR: Center for Biotechnology (CeBiTec), Bielefeld University, 33594
+Bielefeld, Germany</p>
+<p>Send comments/bug reports to: P.Steffen &lt;<a href="mailto:psteffen@techfak.uni-bielefeld.de">psteffen@techfak.uni-bielefeld.de</a>&gt;.</p>
+<p>Updates: <a href="http://bibiserv.techfak.uni-bielefeld.de/rnashapes/">http://bibiserv.techfak.uni-bielefeld.de/rnashapes/</a></p>
+<p><strong>RNAshapes contains code from the following contributors:</strong></p>
+<p><strong>Structure graph output:</strong>
+Vienna RNA Package, version 1.5.
+Copyright (C) Ivo Hofacker, Peter Stadler, Walter Fontana, Stefan Wuchty.  
+Institute for Theoretical Chemistry of the University of Vienna.
+Based on NAVIEW, Copyright (C) 1988 Robert E. Bruccoleri</p>
+<p><strong>Random number generator MT19937:</strong>
+Copyright (C) 1997-2002, Makoto Matsumoto and Takuji Nishimura,
+All rights reserved.</p>
+<p><strong>Editline library (libedit):</strong>
+Copyright (C) 1997-2003 The NetBSD Foundation, Inc.
+All rights reserved.</p>
+<p>
+</p>
+<hr />
+<h1><a name="references">REFERENCES</a></h1>
+<p>P. Steffen, B. Voss, M. Rehmsmeier, J. Reeder and
+R. Giegerich. RNAshapes: an integrated RNA analysis package based on
+abstract shapes. Bioinformatics (2005), Epub ahead of print.</p>
+<p>R. Giegerich, B. Voss and M. Rehmsmeier. Abstract Shapes of RNA.
+Nucl. Acids Res. (2004), Vol.32, pp. 4843-4851.</p>
+<p>M. Hoechsmann, B. Voss and R. Giegerich. Pure Multiple RNA Secondary
+Structure Alignments: A Progressive Profile Approach. IEEE/ACM
+Transactions on Computational Biology and Bioinformatics (2004),
+Vol.1(1), pp. 53-62.</p>
+<p>I.L. Hofacker, W. Fontana, P.F. Stadler, L.S. Bonhoeffer, M. Tacker
+and P.Schuster. Fast folding and comparison of RNA secondary
+structures. Monatshefte f. Chemie (1994), Vol.125, pp. 167-188.</p>
+<p>J. Reeder and R. Giegerich. Consensus shapes: an alternative to the
+Sankoff algorithm for RNA consensus structure prediction.
+Bioinformatics (2005), Vol.21(17), pp. 3516-3523.</p>
+<p>D. Sankoff. Simultaneous Solution of the RNA Folding, Alignment and
+Protosequence Problems. SIAM J. Appl Math (1985), Vol.45(5),
+pp. 810-825.</p>
+<p>B. Voss, R. Giegerich and M. Rehmsmeier. Complete Probabilistic
+Analysis of RNA Shapes. Manuscript under review. (2005).</p>
+</DIV>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+</TD></TR>
+<TR><TD background="frbottom.jpg" height="26">&nbsp;</TD></TR>
+</TABLE>
+</body>
+
+</html>

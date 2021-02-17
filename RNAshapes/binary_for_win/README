@@ -1,0 +1,52 @@
+RNAshapes
+Copyright (C) 2005-2006 Peter Steffen, Bjoern Voss, Jens Reeder,
+Marc Rehmsmeier, Robert Giegerich.
+Send comments/bug reports to: P.Steffen <psteffen@techfak.uni-bielefeld.de>.
+Updates: http://bibiserv.techfak.uni-bielefeld.de/rnashapes/
+
+Quickstart
+------------
+Type
+    ./configure
+    make
+    make install
+
+to configure, make and install RNAshapes.
+
+Type 
+    RNAshapes -h
+
+for command line options overview and 
+
+    RNAshapes -H <option>
+
+for information on a specific option (e.g. RNAshapes -H -q).
+
+See "RNAshapes.pdf" for the user's manual and an exemplified
+introduction to RNAshapes.
+
+Also see 
+    "INSTALL"        for detailed installation instructions, and
+    "COPYING"        for disclaimer and copyright.
+
+
+Graphical user interfaces
+---------------------------
+We offer two graphical user interfaces for RNAshapes:
+
+- Java implementation by Marco Ruether: It can be used on all
+  computers with Java support (Java 1.4.2 or newer required --
+  download from http://java.sun.com/j2se/). To start the user
+  interface, type
+
+    java -jar RNAshapesGUI.jar
+
+  By default, the user interface expects the RNAshapes binary in the
+  same directory as the RNAshapesGUI.jar file. You can change this by
+  selecting Edit->Preferences from the menu bar.
+
+- Graphical user interface for Microsoft Windows: The RNAshapes user
+  interface for Windows requires no Java installation and provides
+  some additional features like interactive secondary structure
+  visualization. It is included in the RNAshapes binary package for
+  Windows (http://bibiserv.techfak.uni-bielefeld.de/rnashapes/).

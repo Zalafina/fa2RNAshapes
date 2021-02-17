@@ -1,0 +1,12 @@
+table,td,th,p,ol { font-family:sans-serif; font-weight:normal; }
+body { font-family:sans-serif; font-weight:normal; }
+em, strong  { font-weight:bold; }
+a:link    { color:#008000; }
+a:visited { color:#003000; }
+a:hover   { color:#00AA00; }
+a:active  { color:#00AA00; }
+h1 { font-size: 120%; }
+h2 { font-size: 110%; }
+h3 { font-size: 105%; }
+h4 { font-size: 105%; }
+

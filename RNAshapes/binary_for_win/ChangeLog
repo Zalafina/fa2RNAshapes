@@ -1,0 +1,34 @@
+Version 2.1.5   Apr. 15. 2008
+	* changed definition of shape types
+	* new option -A to omit output of samples in sampling mode
+	* new option -y to set the minimal length of subshapes
+Version 2.1.2   Apr. 13. 2006
+        * new option -U for direct start of graphical user interface
+Version 2.1.1   Feb. 2. 2006
+	* interactive mode now with complete interface to all program
+	  options 
+	* optional colored output 
+	* consensus shapes analysis with output support for RNAforester
+	  (-o f)
+	* some small changes in Java GUI
+
+Version 2.1     Dec. 29. 2005
+	* included graphical user interface (implemented in Java) by Marco
+	  Ruether
+	* new option -l to allow lonely base pairs
+	* new option -M to specify the maximum loop lengths
+	* new option -# to limit the number of printed results
+	* ANSI escape sequences now allowed in format string
+	  (e.g. for colored output)
+	* added error messages to memory management
+	* removed structures from example file "ires.fasta"
+	
+Version 2.0.1   Oct. 26. 2005
+	* Consensus shapes mode: in some cases (shapes with the same
+	energy), the printed shape rank differed from the shape rank
+	printed by the original RNAcast. Now fixed.
+        * segmentation fault with some inputs and option -C fixed
+	* shape-rank can now also be configured with format string
+
+Version 2.0     Oct. 21. 2005
+	* initial version of the C reimplementation
